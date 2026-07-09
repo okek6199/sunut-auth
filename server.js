@@ -22,7 +22,17 @@ app.use(cors({
 }));
 
 const TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
-
+app.get('/api/test-db', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Database test failed:', err);
+    res.status(500).json({
+      error: err.message
+    });
+  }
+});
 // ---------- REGISTER ----------
 app.post('/api/register', async (req, res) => {
   try {
