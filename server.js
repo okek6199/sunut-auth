@@ -11,7 +11,9 @@ const { sendVerificationEmail } = require('./mailer');
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-
+app.get("/", (req, res) => {
+    res.send("Backend is running");
+});
 // Allow requests from your static frontend on Railway.
 // Add both your Railway URL and localhost while testing.
 app.use(cors({
