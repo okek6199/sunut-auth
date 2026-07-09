@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — Ornamental Plants Shop</title>
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+  <div class="auth-card">
+    <h1>Welcome back 🌱</h1>
+    <p class="subtitle">Log in to your account.</p>
+
+    <div id="message" class="message"></div>
+
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" required autocomplete="email">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" required autocomplete="current-password">
+
+      <button type="submit" id="submitBtn">Log in</button>
+    </form>
+
+    <p class="switch-link">Don't have an account? <a href="register.html">Sign up</a></p>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    const form = document.getElementById('loginForm');
+    const messageEl = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // If the user just clicked the verification link, say so.
+    if (new URLSearchParams(window.location.search).get('verified') === '1') {
+      showMessage(messageEl, 'Email verified! You can log in now.', 'success');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in...';
+
+      try {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const data = await apiRequest('/api/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        });
+        showMessage(messageEl, `Logged in as ${data.email}. Redirecting...`, 'success');
+        setTimeout(() => (window.location.href = 'index.html'), 800);
+      } catch (err) {
+        showMessage(messageEl, err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Log in';
+      }
+    });
+  </script>
+</body>
+</html>

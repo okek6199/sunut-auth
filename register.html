@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create an account — Ornamental Plants Shop</title>
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+  <div class="auth-card">
+    <h1>Create an account 🌿</h1>
+    <p class="subtitle">Join to save favorites and track your orders.</p>
+
+    <div id="message" class="message"></div>
+
+    <form id="registerForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" required autocomplete="email">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" required autocomplete="new-password" minlength="8">
+
+      <button type="submit" id="submitBtn">Create account</button>
+    </form>
+
+    <p class="switch-link">Already have an account? <a href="login.html">Log in</a></p>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    const form = document.getElementById('registerForm');
+    const messageEl = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account...';
+
+      try {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const data = await apiRequest('/api/register', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        });
+        showMessage(messageEl, data.message, 'success');
+        form.reset();
+      } catch (err) {
+        showMessage(messageEl, err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create account';
+      }
+    });
+  </script>
+</body>
+</html>
