@@ -33,6 +33,21 @@ app.get('/api/test-db', async (req, res) => {
     });
   }
 });
+app.get('/api/test-users-table', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users LIMIT 1');
+    res.json({
+      success: true,
+      rowsReturned: result.rows.length
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
 // ---------- REGISTER ----------
 app.post('/api/register', async (req, res) => {
   try {
