@@ -9,6 +9,23 @@ const transporter = nodemailer.createTransport({
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
+  // Without these, a stuck connection hangs forever instead of failing
+  // with a readable error. 10s is generous but bounded.
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
+  logger: true,  // prints SMTP conversation to the Railway logs
+  debug: true,   // includes auth handshake details
+});
+
+// Runs once when the server boots. Logs a clear pass/fail instead of
+// waiting for the first real email attempt to reveal a problem.
+transporter.verify((err, success) => {
+  if (err) {
+    console.error('❌ SMTP verify failed:', err.message);
+  } else {
+    console.log('✅ SMTP connection verified, ready to send.');
+  }
 });
 
 async function sendVerificationEmail(toEmail, token) {
