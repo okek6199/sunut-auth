@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Login/registration backend with email verification for the ornamental plants shop",
   "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node server.js"
   },
@@ -13,7 +16,6 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.9.13",
     "pg": "^8.11.5"
   }
 }
