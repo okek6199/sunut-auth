@@ -1,32 +1,32 @@
-// Sends email via Resend's HTTPS API instead of SMTP.
-// We switched away from Gmail SMTP because Railway's network was
-// silently blocking outbound SMTP connections (ports 465/587) —
-// confirmed via repeated "Connection timeout" errors. Resend sends
-// over plain HTTPS (port 443), same as any normal API call, so it
-// isn't affected by that block.
+// Sends email via Brevo's HTTPS API (not SMTP — same reasoning as before,
+// Railway was silently blocking outbound SMTP ports).
+//
+// We switched from Resend to Brevo specifically because Brevo lets you
+// verify a single sender EMAIL ADDRESS you own (like a personal Gmail),
+// with no domain purchase required. Resend requires a verified domain
+// to send to recipients other than the account owner; Brevo doesn't.
 
-const RESEND_API_URL = 'https://api.resend.com/emails';
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
-// "onboarding@resend.dev" works immediately with no setup, for testing.
-// Once you verify your own domain in the Resend dashboard, switch this
-// to something like "accounts@yourdomain.com" for a more trustworthy
-// "from" address.
-const FROM_ADDRESS = process.env.RESEND_FROM || 'Ornamental Plants Shop <onboarding@resend.dev>';
+// Must exactly match the address you verified in Brevo's Senders tab.
+const FROM_NAME = process.env.BREVO_FROM_NAME || 'sunut';
+const FROM_EMAIL = process.env.BREVO_FROM_EMAIL; // e.g. sunutmail@gmail.com
 
 async function sendVerificationEmail(toEmail, token) {
   const verifyUrl = `${process.env.BACKEND_URL}/api/verify-email?token=${token}`;
 
-  const res = await fetch(RESEND_API_URL, {
+  const res = await fetch(BREVO_API_URL, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'api-key': process.env.BREVO_API_KEY,
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify({
-      from: FROM_ADDRESS,
-      to: toEmail,
+      sender: { name: FROM_NAME, email: FROM_EMAIL },
+      to: [{ email: toEmail }],
       subject: 'Verify your email',
-      html: `
+      htmlContent: `
         <div style="font-family: sans-serif; max-width: 480px; margin: auto;">
           <h2 style="color:#3f6b3f;">Welcome to the Plant Shop 🌿</h2>
           <p>Thanks for signing up. Please confirm your email address to activate your account.</p>
@@ -46,7 +46,7 @@ async function sendVerificationEmail(toEmail, token) {
 
   if (!res.ok) {
     const errorBody = await res.text();
-    throw new Error(`Resend API error (${res.status}): ${errorBody}`);
+    throw new Error(`Brevo API error (${res.status}): ${errorBody}`);
   }
 }
 
