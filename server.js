@@ -25,7 +25,7 @@ const TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 app.get('/api/test-email', async (req, res) => {
   try {
     await sendVerificationEmail(
-      'YOUR_REAL_EMAIL@example.com',
+      'okek6199@gmail.com',
       'test-token'
     );
 
