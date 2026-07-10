@@ -22,6 +22,27 @@ app.use(cors({
 }));
 
 const TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+app.get('/api/test-email', async (req, res) => {
+  try {
+    await sendVerificationEmail(
+      'YOUR_REAL_EMAIL@example.com',
+      'test-token'
+    );
+
+    res.json({
+      success: true,
+      message: 'Email sent'
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
 app.get('/api/test-db', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
